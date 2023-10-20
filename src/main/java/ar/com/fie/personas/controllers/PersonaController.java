@@ -4,6 +4,9 @@ package ar.com.fie.personas.controllers;
 import ar.com.fie.personas.entitys.PersonaEntity;
 import ar.com.fie.personas.repositories.PersonaRepository;
 
+import ar.com.fie.personas.services.PersonaService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,39 +15,40 @@ import java.util.List;
 @RequestMapping("/api")
 public class PersonaController {
 
-    private final PersonaRepository personaRepository;
+    private final PersonaService personaService;
 
     // Constructor para inyectar el repositorio
-    public PersonaController(PersonaRepository personaRepository) {
-        this.personaRepository = personaRepository;
+
+    public PersonaController(PersonaService personaService) {
+        this.personaService = personaService;
     }
 
     @GetMapping("/listar")
     public List<PersonaEntity> listarPersonas() {
-        return personaRepository.findAll();
+        return personaService.listarPersonas();
     }
 
     @PostMapping("/crear")
-    public PersonaEntity crearPersona(@RequestBody PersonaEntity persona) {
-        return personaRepository.save(persona);
+    public ResponseEntity<String> crearPersona(@RequestBody PersonaEntity persona) {
+        PersonaEntity Persona =  personaService.crearPersona(persona);
+        return ResponseEntity.ok("Creación exitosa. ID de la nueva persona: " + Persona.getId());
     }
 
     @PutMapping("/actualizar/{id}")
-    public PersonaEntity actualizarPersona(@PathVariable Long id, @RequestBody PersonaEntity personaActualizada) {
-        return personaRepository.findById(id)
-                .map(persona -> {
-                    persona.setNombre(personaActualizada.getNombre());
-                    persona.setApellido(personaActualizada.getApellido());
-                    persona.setEmail(personaActualizada.getEmail());
-                    persona.setPassword(personaActualizada.getPassword());
-                    return personaRepository.save(persona);
-                })
-                .orElse(null);
+    public ResponseEntity<String> actualizarPersona(@PathVariable Long id, @RequestBody PersonaEntity personaActualizada) {
+
+        if (!personaService.buscarPersonaPorId(id).isPresent()) {
+            return ResponseEntity.badRequest().body("No se encontro la persona con el id: " + id);
+        }
+
+        return ResponseEntity.ok("Actualización exitosa. ID de la persona actualizada: "
+                + personaService.actualizarPersona(id, personaActualizada).getId());
+
     }
 
     @DeleteMapping("/eliminar/{id}")
     public void eliminarPersona(@PathVariable Long id) {
-        personaRepository.deleteById(id);
+        personaService.eliminarPersona(id);
     }
 
 
