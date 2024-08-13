@@ -1,8 +1,7 @@
-//src/main/java/ar/com/fie/personas/controllers/PersonaController.java
 package ar.com.fie.personas.controllers;
 
 import ar.com.fie.personas.entitys.PersonaEntity;
-import ar.com.fie.personas.repositories.PersonaRepository;
+import ar.com.fie.personas.services.PersonaService;
 
 import org.springframework.web.bind.annotation.*;
 
@@ -12,41 +11,31 @@ import java.util.List;
 @RequestMapping("/api")
 public class PersonaController {
 
-    // Inyectamos el repositorio
-    private final PersonaRepository personaRepository;
+    // Inyectamos el servicio
+    private final PersonaService personaService;
 
-    // Constructor para inyectar el repositor
-    public PersonaController(PersonaRepository personaRepository) {
-        this.personaRepository = personaRepository;
+    // Constructor para inyectar el servicio
+    public PersonaController(PersonaService personaService) {
+        this.personaService = personaService;
     }
 
     @GetMapping("/listar")
     public List<PersonaEntity> listarPersonas() {
-        return personaRepository.findAll();
+        return personaService.listarPersonas();
     }
 
     @PostMapping("/crear")
     public PersonaEntity crearPersona(@RequestBody PersonaEntity persona) {
-        return personaRepository.save(persona);
+        return personaService.crearPersona(persona);
     }
 
     @PutMapping("/actualizar/{id}")
     public PersonaEntity actualizarPersona(@PathVariable Long id, @RequestBody PersonaEntity personaActualizada) {
-        return personaRepository.findById(id)
-                .map(persona -> {
-                    persona.setNombre(personaActualizada.getNombre());
-                    persona.setApellido(personaActualizada.getApellido());
-                    persona.setEmail(personaActualizada.getEmail());
-                    persona.setPassword(personaActualizada.getPassword());
-                    return personaRepository.save(persona);
-                })
-                .orElse(null);
+        return personaService.actualizarPersona(id, personaActualizada);
     }
 
     @DeleteMapping("/eliminar/{id}")
     public void eliminarPersona(@PathVariable Long id) {
-        personaRepository.deleteById(id);
+        personaService.eliminarPersona(id);
     }
-
-
 }
