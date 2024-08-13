@@ -12,6 +12,7 @@ import java.util.List;
 @RequestMapping("/api")
 public class PersonaController {
 
+    // Inyectamos el repositorio
     private final PersonaRepository personaRepository;
 
     // Constructor para inyectar el repositorio
