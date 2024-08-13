@@ -15,7 +15,7 @@ public class PersonaController {
     // Inyectamos el repositorio
     private final PersonaRepository personaRepository;
 
-    // Constructor para inyectar el repositorio
+    // Constructor para inyectar el repositor
     public PersonaController(PersonaRepository personaRepository) {
         this.personaRepository = personaRepository;
     }
